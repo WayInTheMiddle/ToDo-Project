@@ -1,0 +1,30 @@
+/**********************************************
+*** GENERAL
+**********************************************/
+
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+
+header.top {
+   height: 17rem;
+   background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(../SFS.jpg);
+   background-size: cover;
+   background-position: center;
+   position: relative;
+   /* font-family: Oldtown, fantasy;; */
+}
+
+.todo-menu {
+   float: right;
+ }
+.task-title {
+   float: left;
+}
+
+.logo {
+   /* margin-top : 100px; */
+}

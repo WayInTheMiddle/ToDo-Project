@@ -1,0 +1,22 @@
+{
+  "name": "todomysql",
+  "version": "1.0.0",
+  "description": "Integrating ToDo application with MySql",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "task",
+    "todo",
+    "app",
+    "server-side"
+  ],
+  "author": "Ha-Soon (Alan)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "save": "^2.4.0"
+  }
+}
