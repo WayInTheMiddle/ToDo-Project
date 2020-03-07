@@ -1,113 +1,4 @@
-const express = require('express');
-const mysql = require('mysql');
-
-// //Creating connection
-const port = '3000';
-const db = mysql.createConnection({
-   host     : 'localhost',
-   user     : 'root',
-   password : '2244',
-   database : 'todo'
-});
-
-
-// Connect to database
-db.connect((err) => {
-   if(err) {
-      throw err;
-   }
-   console.log('MySQL connected ...');
-});
-
-const app = express();
-
-// // Create Database
-app.get('/createdb', (req, res) => {
-   let sql = 'CREATE DATABASE TODO';
-   db.query(sql, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Database created ...');
-   });
-});
-
-// // Create Table
-app.get('/createtable', (req, res) => {
-   let sql = 'CREATE TABLE posts(id int AUTO_INCREMENT, title VARCHAR(255), details VARCHAR(1024), PRIMARY KEY (id))';
-   db.query(sql, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Posts table created ...');
-   });
-});
-
-// // Insert post 1
-app.get('/addpost1', (req, res) => {
-   let post = {title: 'Node.js & sql implementation', details : 'Setup MySql using Node.js etc.'
-   }
-   let sql = 'INSERT INTO posts SET ?';
-   let query = db.query(sql, post, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Record Inserted...');
-   });
-});
-
-app.get('/addpost2', (req, res) => {
-   let post = {title: 'Weather API', details : 'Implmentiong Weather App using Weather API'
-   }
-   let sql = 'INSERT INTO posts SET ?';
-   let query = db.query(sql, post, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Record Inserted...');
-   });
-});
-// SELECT postS
-app.get('/getposts', (req, res) => {
-
-   let sql = 'SELECT * FROM posts';
-   let query = db.query(sql, (err, results) => {
-      if(err) throw err;
-      console.log(results);
-      res.send('Post Fetched ...');
-   });
-});
-
-// SELECT single post
-app.get('/getpost/:id', (req, res) => {
-
-   let sql = `SELECT * FROM posts WHERE id= ${req.params.id}`;
-   let query = db.query(sql, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Post Fetched ...');
-   });
-});
-// UPDATE  post
-app.get('/updatepost/:id', (req, res) => {
-   let newTitle = 'Updated Title';
-   let sql = `UPDATE posts SET title = '${newTitle}' WHERE id = ${req.params.id}`;
-   let query = db.query(sql, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Post Updated ...');
-   });
-});
-// DELETE  post
-app.get('/deletepost/:id', (req, res) => {
-   
-   let sql = `DELETE FROM posts WHERE id = ${req.params.id}`;
-   let query = db.query(sql, (err, result) => {
-      if(err) throw err;
-      console.log(result);
-      res.send('Post Deleted ...');
-   });
-});
-// ////////////////////////////////////////////////////////////
-app.listen(port, () => {
-   console.log('Server started on port 3000 ...');
-});
+// 
 
 const priorities = {    // JavaScript Enumeration
    QUAD1: 'Urgent-Important',      //Do first - do it now
@@ -115,12 +6,20 @@ const priorities = {    // JavaScript Enumeration
    QUAD3: 'Urgent-NImportant',     //Delegate - Who can do it for me?
    QUAD4: 'NUrgent-NImportant'     //Delete - Eliminate
 };
+const states = {
+   INSERT: 'insert',
+   UPDATE: 'update',
+   DELETE: 'delete',
+   EDIT: 'edit',
+   NORMAL: 'normal'
+};
 
 // Self-Invoking Functions
 var ToDoDataController = (function () {
-   console.log('DataModel has started ... ');
+   // console.log('DataModel has started ... ');
    ////////////  Function Constructor  //////////////////////////////////////////////////////
-   var TodoTask = function (id, title, details, priority, fromDate, tillDate, status, state) {
+   var TodoTask = function (id, title, details, priority, fromDate, tillDate, status
+   ) {
       this.id = id;
       this.title = title;
       this.details = details;
@@ -128,7 +27,8 @@ var ToDoDataController = (function () {
       this.fromDate = fromDate;
       this.tillDate = tillDate;
       this.status = status;
-      this.state = state; // EDIT / DONE / CANCELLED /TEMPORARY <Internal Control State
+      this.states = states.NORMAL; // EDIT / DONE / CANCELLED /TEMPORARY <Internal Control states
+
    };
 
    var taskData = {
@@ -158,14 +58,15 @@ var ToDoDataController = (function () {
             }
          });
          //         task = taskData.allTasks[parseInt(selector.split('-')[2])];  // in question when deleted task
-         selectedTask.state = 'EDIT';
+         selectedTask.states = states.EDIT;
          return selectedTask;
       },
+
       alterToDo: function (newVal) {
          var alteredTask;
          taskData.allTasks.forEach(function (item) {
-            if (item.state === 'EDIT') { // To get the item under editting
-               item.state = '';        // clearing 'EDIT' state
+            if (item.states === states.EDIT) { // To get the item under editting
+               item.states = states.NORMAL;        // clearing 'EDIT' states             
                item.title = newVal.title;
                item.details = newVal.details;
                item.priority = newVal.priority;
@@ -180,9 +81,11 @@ var ToDoDataController = (function () {
       getTaskData: function () {
          return taskData;
       },
+
       storeTaskData: function () {
          localStorage.setItem("taskSFSJSON", JSON.stringify(taskData));
       },
+
       deleteToDo: function (selector) {
          var ids, index;
          //////////////   Wrong way to delete item  /////////////////////////////////////        
@@ -212,8 +115,10 @@ var ToDoDataController = (function () {
          }
          return null;
       },
+
       testing: function () {
          console.log("Task Data ...." + taskData.allTasks[0].title);
+
       }
 
    }
@@ -221,7 +126,7 @@ var ToDoDataController = (function () {
 
 var UIController = (function () {
 
-   console.log('UIController has started ... ');
+   // console.log('UIController has started ... ');
 
    var nodeListForEach = function (list, callback) {
       for (var i = 0; i < list.length; i++) {
@@ -485,9 +390,26 @@ var controller = (function (dataController, uiController) {
 
       document.getElementById("save-button").onclick = saveTasks;
 
-      document.getElementById("show-button").onclick = function () {
-         console.log("show clicked ...");
-      };
+      document.getElementById("show-button").onclick = async function () {
+
+         var taskData;
+         // taskData = ToDoDataController.retrieveTaskData();
+         taskData = await retrieveRecords();
+
+         if (taskData !== null) {
+
+            console.log('taskData.length...' + taskData.length);
+            for (task of taskData) {
+               UIController.addToDoUI(task);
+            }
+            // for(let i = 0; i < taskData.length; i++) {
+            //    UIController.addToDoUI(taskData[i]);
+
+            // }
+
+
+         };
+      }
 
       //////////////////// ToDo Modal Event Handler  ////////////////////////////////
       document.getElementById("add-task").onclick = addTask;
@@ -503,7 +425,7 @@ var controller = (function (dataController, uiController) {
    var handleItemEvent = function (event) {
       var selectedItem = "item-todo-" + event.target.id.split('-')[2];
       var selectedContent = "todo-content-" + event.target.id.split('-')[2];
-      console.log(selectedItem);
+      console.log('event.target.id ...' + event.target.id);
       if (event.target.id.substr(0, 3) === 'clo') {
          document.getElementById(selectedItem).style.display = "none";
       } else if (event.target.id.substr(0, 3) === 'edi') {    // Edit todo
@@ -535,6 +457,7 @@ var controller = (function (dataController, uiController) {
    var deleteTask = function (item) {
       console.log(`Delete Event occurred ... ${item}`);
       ToDoDataController.deleteToDo(item);
+      // removeRecord(item);
       UIController.deleteTodoUI(item);
    };
 
@@ -542,6 +465,7 @@ var controller = (function (dataController, uiController) {
       var alteredTask, input;
       input = UIController.getInput();
       alteredTask = ToDoDataController.alterToDo(input);
+      // updateRecord(alteredTask);
       UIController.deleteTodoUI(`item-todo-${alteredTask.id}`);
 
       UIController.alterTodoUI(alteredTask);
@@ -559,39 +483,140 @@ var controller = (function (dataController, uiController) {
 
       newTask = dataController.addToDo(data.title, data.details, data.priority, data.fromDate, data.tillDate, data.status);
       // dataController.testing();
+
+      // addRecord(newTask);
       UIController.addToDoUI(newTask);
       // UIController.styleToDo(newTask);
       UIController.clearFields();
       document.getElementById("add-modal").style.display = 'none';
+
    };
    var saveTasks = function () {
       console.log("Save clicked ...");
       ToDoDataController.storeTaskData();
+      saveRecords();
    };
 
    var initTaskData = function () {
-      var taskData;
-      taskData = ToDoDataController.retrieveTaskData();
-      // debugger;
+      retrieveRecords();
+      // var taskData;
+      // // taskData = ToDoDataController.retrieveTaskData();
+      // taskData = retrieveRecords();
+
+      // if (taskData !== null) {
+      //    // taskData.allTasks.forEach(function (task) {
+      //    //    UIController.addToDoUI(task);
+      //    //    // styleToDo(task);
+      //    // });
+
+      //    // for (task of taskData) {
+      //    //    UIController.addToDoUI(task);
+      //    // }
+
+      //    debugger;
+      //    for(let i = 0; i < taskData.length; i++) {
+      //       console.log(taskData[i].parse.title);
+      //    }
+      // taskData.allTasks.filter(function (task) {
+      //    console.log(task.fromDate);
+      // });
+      // }
+   };
+
+   // var addRecord = async function (item) {
+   //    const data = {
+   //       _id: item.id, title: item.title, details: item.details,
+   //       priority: item.priority, fromDate: item.fromDate,
+   //       tillDate: item.tillDate, status: item.status, states: states.INSERT
+   //    };
+   //    const options = {
+   //       method: 'POST',
+   //       headers: {
+   //          'Content-Type': 'application/json'
+   //       },
+   //       body: JSON.stringify(data)
+   //    };
+   //    const response = await fetch('/todo', options);
+   //    const todoJSON = await response.json();
+   //    console.log(todoJSON);
+   // };
+
+   // var updateRecord = async function (item) {
+   //    console.log('updateRecord ...');
+   //    const data = {
+   //       _id: item.id, title: item.title, details: item.details,
+   //       priority: item.priority, fromDate: item.fromDate,
+   //       tillDate: item.tillDate, status: item.status, states: states.UPDATE
+   //    };
+   //    const options = {
+   //       method: 'POST',
+   //       headers: {
+   //          'Content-Type': 'application/json'
+   //       },
+   //       body: JSON.stringify(data)
+   //    };
+   //    const response = await fetch('/todo', options);
+   //    const todoJSON = await response.json();
+   //    console.log(todoJSON);
+   // };
+   // var removeRecord = async function(item) {
+   //    debugger;
+   //    const data = {
+   //       _id: item.id, title: item.title, details: item.details,
+   //       priority: item.priority, fromDate: item.fromDate,
+   //       tillDate: item.tillDate, status: item.status, states: states.DELETE
+   //    };
+   //    const options = {
+   //       method: 'POST',
+   //       headers: {
+   //          'Content-Type': 'application/json'
+   //       },
+   //       body: JSON.stringify(data)
+   //    }
+   //    const response = await fetch('/todo', options)
+   // };
+
+   var saveRecords = async function () {
+      const taskData = ToDoDataController.getTaskData();
+      const options = {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify(taskData.allTasks)
+      };
+      const response = await fetch('/todo', options);
+      const todoJSON = await response.json();
+      console.log(todoJSON);
+   };
+
+   var retrieveRecords = async function () {
+      console.log('retrieveRecords ...');
+      const response = await fetch('/todo');
+      const taskData = await response.json();
+      ToDoDataController.getTaskData().allTasks = taskData;
       if (taskData !== null) {
-         taskData.allTasks.forEach(function (task) {
+         // taskData.forEach(function (task) {
+         //    UIController.addToDoUI(task);
+
+         // });
+
+         for (task of taskData) {
             UIController.addToDoUI(task);
-            // styleToDo(task);
-         });
-         taskData.allTasks.filter(function (task) {
-            console.log(task.fromDate);
-         });
+         }
       }
-   };
-   return {
-      init: function () {
-         console.log('Application - ToDo has started ... ');
-         initTaskData();
+   }
 
-         handleEvents();
-      }
-   };
+      return {
+         init: function () {
+            console.log('Application - ToDo has started ... ');
 
-})(ToDoDataController, UIController);
+            initTaskData();
 
-controller.init();
+            handleEvents();
+         }
+      };
+
+   })(ToDoDataController, UIController);
+
+   controller.init();
