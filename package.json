@@ -15,7 +15,7 @@
   "author": "Ha-Soon (Alan)",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "mysql": "^2.18.1",
     "nedb": "^1.8.0",
     "save": "^2.4.0"
